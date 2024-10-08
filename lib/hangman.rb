@@ -1,6 +1,5 @@
 require 'json'
 require 'set'
-require 'random'
 
 class HangmanGame
   attr_accessor :secret_word, :guesses_left, :letter_set
@@ -25,43 +24,55 @@ class HangmanGame
 
   # Creates JSON string, writes it to a file in the sav/ directory
   def save()
-    Dir.mkdir('lib/saves') unless Dir.exist?('lib/saves')
-    game_save = File.new('sav/game_save.json', 'w+') if File.exist?('sav/game_save.json')
-
-    game_save.write(to_json())
+    Dir.mkdir('lib/sav') unless Dir.exist?('lib/sav')
+    game_save = File.open('lib/sav/game_save.json', 'w+')
+    game_save.write(JSON.dump({:word => @secret_word, :guess => @guesses_left, :set => @letter_set.to_a}))
     game_save.close()
 
   end
 
-  # Loads a JSON file from the sav directory
-  def load()
-    game_save = File.read('sav/game_save.json') if Dir.exist?('lib/saves') and File.exist?('sav/game_save.json')
-    game_data = from_json(game_save)
+  # Loads a JSON file from the sav directory, and creates appropriate game
+  def self.load()
+    save_file = File.open('lib/sav/game_save.json', 'r') if Dir.exist?('lib/sav') and File.exist?('lib/sav/game_save.json')
+    game_save = save_file.read()
+    game_data = JSON.load(game_save)
     
-    @secret_word = game_data[:word]
-    @guesses_left = game_data[:guess]
-    @letter_set = game_data[:set]
+    return self.new({:word => game_data['word'], :guess => game_data['guess'], :set => Set.new(game_data['set'])})
   end
 
   private
 
+  # Load all words from the given file into an array, if they are 5-12 chars long
   def load_words(path)
+    dict = File.open(path, 'r')
+    words = dict.read.()
+    words = words.split('/n')
+    words.delete_if do |word|
+      word.length < 5 or word.length > 12
+    end
 
+    return words
   end
 
-  def generate_word()
+  # Return a random word from the selected file
+  def generate_word(path)
+    words = load_words(path)
+    prng = Random.new(Random.seed)
 
+    return words[prng.rand(words.length)]
   end
 
-  def to_json
-    return JSON.dump({
-      :word => @secret_word,
-      :guess => @guesses_left,
-      :set => @letter_set
-    })
-  end
+  # # Return JSON string
+  # def to_json
+  #   return JSON.dump({
+  #     :word => @secret_word,
+  #     :guess => @guesses_left,
+  #     :set => @letter_set
+  #   })
+  # end
 
-  def from_json(string)
-    return JSON.load(string)
-  end
+  # # Return hash
+  # def from_json(string)
+  #   return JSON.load(string)
+  # end
 end
