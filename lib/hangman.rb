@@ -11,7 +11,7 @@ class HangmanGame
   # Constructor to set the values of the word, #guesses left, and letter set
   def initialize(args)
     args[:word].nil? ? @secret_word = generate_word('lib/dict/google-10000-english-no-swears.txt') : @secret_word = args[:word]
-    args[:guess].nil? ? @guesses_left = 6 : @guesses_left = args[:guess]
+    args[:guess].nil? ? @guesses_left = 10 : @guesses_left = args[:guess]
     args[:set].nil? ? @letter_set = Set.new() : @letter_set = args[:set]
   end
 
@@ -24,8 +24,8 @@ class HangmanGame
     end
   end
 
-  # returns true if game is over
-  def is_over?
+  # Return true if the word has been guessed
+  def word_guessed?
     letters_guessed = true
 
     # Are all letters guessed?
@@ -34,8 +34,13 @@ class HangmanGame
         letters_guessed = false
       end
     end
+    return letters_guessed
+  end
+
+  # returns true if game is over
+  def is_over?
     # Is the number of guesses more than 0?
-    letters_guessed or (@guesses_left == 0)
+    word_guessed? or (@guesses_left == 0)
   end
 
   def to_s

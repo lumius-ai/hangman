@@ -1,6 +1,6 @@
 require 'set'
 require 'json'
-require 'pry-byebug'
+
 require_relative '../lib/hangman'
 
 # frozen_string_literal: true
@@ -29,7 +29,7 @@ describe "Hangman class testing" do
     end
   
     it "assigns default number of guesses" do
-      expect(y.guesses_left).to eq(6)
+      expect(y.guesses_left).to eq(10)
     end
   
     it "assigns default set" do
@@ -116,11 +116,11 @@ describe "Hangman class testing" do
     end
 
     it "decrements number of guesses if char is not in word" do
-      expect(obj.guesses_left).to eq(5)
+      expect(obj.guesses_left).to eq(9)
     end
 
     it "does not decrement guesses if given char is in word" do
-      expect(obj2.guesses_left).to eq(6)
+      expect(obj2.guesses_left).to eq(10)
     end
 
   end

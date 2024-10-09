@@ -2,32 +2,63 @@ require_relative 'lib/hangman'
 require 'set'
 require 'json'
 
-# Load all words from the given file into an array, if they are 5-12 chars long
-def load_words(path)
-  dict = File.open(path, 'r')
-  words = dict.read()
-  words = words.split("\n")
-  words.delete_if do |word|
-    word.length < 5 or word.length > 12
-  end
-  return words
+require 'pry-byebug'
+
+# prompting a response
+def prompt(string)
+  puts(string)
+  reply = gets().chomp()
+  return reply
 end
 
-# Return a random word from the selected file
-def generate_word(path)
-  if not File.exist?(path)
+# Create game either new or from load
+def make_game(mode)
+  case mode
+  when 'n'
+    return HangmanGame.new({})
+  when 'l'
+    if File.exist?('lib/sav/game_save.json')
+      return HangmanGame.load()
+    else
+      puts("NO SAVED GAME FOUND, STARTING NEW GAME")
+      return HangmanGame.new({})
+    end
+  else
+    puts("Invalid mode")
     return nil
   end
-  words = load_words(path)
-  prng = Random.new(Random.seed)
-
-  return words[prng.rand(words.length)]
 end
-
 def main()
-  puts(File.exist?("lib/dict/google-10000-english-no-swears.txt"))
-  puts(generate_word('lib/dict/google-10000-english-no-swears.txt'))
-  puts(generate_word('lib/dict/google-10000-english-no-swears.txt'))
+  input = ""
+  puts("HANGMAN\n-------")
+  while input != 'n' and input != 'l'
+    input = prompt("type 'n' for new game, 'l' to load game")
+  end
+
+  game = make_game(input)
+
+  while not game.is_over?
+    puts(game)
+    guess = prompt("Guess a letter. Type '/save' to save progress, 'quit' to quit game")
+
+    if guess.length() != 1 and guess != '/save' and guess != '/quit'
+      puts("Guess a single letter")
+      next
+    end 
+
+    case guess
+    when '/save'
+      game.save()
+      puts("\nGAME SAVED\n")
+    when '/quit'
+      puts("bye")
+      return
+    else
+      game.make_guess(guess.downcase())
+    end
+  end
+  puts("game over")
+  game.word_guessed? ? puts("You win!") : puts("You lose :(")
 end
 
 main()
