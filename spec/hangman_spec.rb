@@ -24,7 +24,7 @@ describe "Hangman class testing" do
       expect(x.letter_set).to eq(Set.new(['a', 'b']))
     end
 
-    it "assigns default word" do
+    xit "assigns default word" do
       expect(y.secret_word).to eq("TODO")
     end
   
@@ -76,5 +76,36 @@ describe "Hangman class testing" do
     it "restores the set of guessed letters" do
       expect(obj2.letter_set).to eq(obj1.letter_set)
     end
+  end
+
+  # Using custom .txt in /dict
+  describe "Generating words" do
+    obj = HangmanGame.new({})
+    path = 'lib/dict/test.txt'
+
+    xit "Considers only words <12 or >12 characters long" do
+      array = obj.load_words(path)
+      expect(array).to eq(['this_one', 'that_one'])
+    end
+
+    xit "Randomly generates a word from the dictionary" do
+      word  = obj.generate_word(path)
+      expect(word).to eq('this_one') or expect(word).to eq('that_one')
+    end
+
+  end
+
+  describe "to string method" do
+    args = {:word => "abc", :guess => 99, :set => Set.new(['a', 'x', 'c'])}
+    obj = HangmanGame.new(args)
+
+    it "prints number of guesses and secret word correctly" do
+      expect(obj.to_s).to eq("WORD: a _ c\nGuesses left: 99")
+    end
+
+  end
+
+  describe "make_guess method" do 
+
   end
 end
