@@ -7,58 +7,55 @@ require 'pry-byebug'
 # prompting a response
 def prompt(string)
   puts(string)
-  reply = gets().chomp()
-  return reply
+  gets.chomp
 end
 
 # Create game either new or from load
 def make_game(mode)
   case mode
   when 'n'
-    return HangmanGame.new({})
+    HangmanGame.new({})
   when 'l'
-    if File.exist?('lib/sav/game_save.json')
-      return HangmanGame.load()
-    else
-      puts("NO SAVED GAME FOUND, STARTING NEW GAME")
-      return HangmanGame.new({})
-    end
+    return HangmanGame.load if File.exist?('lib/sav/game_save.json')
+
+    puts('NO SAVED GAME FOUND, STARTING NEW GAME')
+    HangmanGame.new({})
+
   else
-    puts("Invalid mode")
-    return nil
+    puts('Invalid mode')
+    nil
   end
 end
-def main()
-  input = ""
+
+def main
+  input = ''
   puts("HANGMAN\n-------")
-  while input != 'n' and input != 'l'
-    input = prompt("type 'n' for new game, 'l' to load game")
-  end
+  input = prompt("type 'n' for new game, 'l' to load game") while input != 'n' and input != 'l'
 
   game = make_game(input)
 
-  while not game.is_over?
+  until game.is_over?
     puts(game)
     guess = prompt("Guess a letter. Type '/save' to save progress, 'quit' to quit game")
 
-    if guess.length() != 1 and guess != '/save' and guess != '/quit'
-      puts("Guess a single letter")
+    if guess.length != 1 and guess != '/save' and guess != '/quit'
+      puts('Guess a single letter')
       next
-    end 
+    end
 
     case guess
     when '/save'
-      game.save()
+      game.save
       puts("\nGAME SAVED\n")
     when '/quit'
-      puts("bye")
+      puts('bye')
       return
     else
-      game.make_guess(guess.downcase())
+      game.make_guess(guess.downcase)
     end
   end
-  puts("game over")
-  game.word_guessed? ? puts("You win!") : puts("You lose :(")
+  puts('game over')
+  game.word_guessed? ? puts('You win!') : puts('You lose :(')
 end
 
-main()
+main
