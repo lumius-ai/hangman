@@ -18,21 +18,24 @@ class HangmanGame
   # Adds the char to the letter_set
   def make_guess(char)
     @letter_set.add(char)
+
+    if not @secret_word.split("").include?(char)
+      @guesses_left -= 1
+    end
   end
 
   # returns true if game is over
   def is_over?
-    # Out of guesses
-    if @guesses_left == 0
-      return false
-    end
-    # chars match
-    @secret_word.each do |char|
+    letters_guessed = true
+
+    # Are all letters guessed?
+    @secret_word.split("").each do |char|
       if not @letter_set.include?(char)
-        return false
+        letters_guessed = false
       end
     end
-    return true
+    # Is the number of guesses more than 0?
+    letters_guessed or (@guesses_left == 0)
   end
 
   def to_s

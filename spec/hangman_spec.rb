@@ -1,6 +1,6 @@
 require 'set'
 require 'json'
-
+require 'pry-byebug'
 require_relative '../lib/hangman'
 
 # frozen_string_literal: true
@@ -106,6 +106,39 @@ describe "Hangman class testing" do
   end
 
   describe "make_guess method" do 
+    obj = HangmanGame.new({:word => "aaa"})
+    obj2 = HangmanGame.new({:word => "aaa"})
+    obj.make_guess('b')
+    obj2.make_guess('a')
 
+    it "adds given char to letter_set" do
+      expect(obj.letter_set.include?('b')).to eq(true)
+    end
+
+    it "decrements number of guesses if char is not in word" do
+      expect(obj.guesses_left).to eq(5)
+    end
+
+    it "does not decrement guesses if given char is in word" do
+      expect(obj2.guesses_left).to eq(6)
+    end
+
+  end
+
+  describe "is_over? method" do
+    no_guesses = HangmanGame.new({:word => 'aaa', :guess => 0})
+    word_not_guessed = HangmanGame.new({:word => 'aaa', :set => Set.new(['b'])})
+    word_guessed = HangmanGame.new({:word => 'aaa', :set => Set.new(['a'])})
+    it "returns true if player is out of guesses" do
+      expect(no_guesses.is_over?).to eq(true)
+    end
+
+    it "returns false if guesses > 0 and word is not guessed" do
+      expect(word_not_guessed.is_over?).to eq(false)
+    end 
+
+    it "returns true if word is guessed and number of guesses is > 0" do
+      expect(word_guessed.is_over?).to eq(true)
+    end
   end
 end
